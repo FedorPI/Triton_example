@@ -1,17 +1,7 @@
 # Triton_example
 
-
-
-triton/
-├── model_repository/
-│   ├── resnet18/
-│   │   ├── 1/ 
-│   │   │   └── model.onnx
-│   │   ├── 2/  
-│   │   │   └── model.onnx
-│   │   └── config.pbtxt
-│   │
-│   ├── efficientnet-b0/
-│   │   ├── 1/
-│   │   │   └── model.onnx
-│   │   └── config.pbtxt
+```
+docker compose up -d
+uvicorn api:app --reload --port 5000
+```
+После запуска документция к апи доступна тут - http://127.0.0.1:5000/docs
