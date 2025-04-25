@@ -1,6 +1,7 @@
 import os
 import numpy as np
 from PIL import Image
+from torchvision import transforms
 import grpc
 import tritonclient.grpc.aio as grpcclient
 from tritonclient.grpc import service_pb2, service_pb2_grpc
@@ -36,7 +37,7 @@ class InferenceModule:
         dtype = model_meta.inputs[0].datatype
 
         # Preprocess the image
-        img = self.preprocess_image(img)
+        img = self.preprocess_image_torchvision(img)  # или preprocess_image_pil
 
         # Create input tensor for Triton
         inputs = [grpcclient.InferInput(model_meta.inputs[0].name, [1, channels, height, width], dtype)]
@@ -79,12 +80,12 @@ class InferenceModule:
 
         return metadata_response, config_response
 
-    def preprocess_image(
+    def preprocess_image_pil(
         self,
         img: str,
     ) -> np.ndarray:
         """
-        Preprocess the input image for ResNet18.
+        Preprocess the input image for ResNet.
 
         Args:
             img (str): Base64 encoded image string.
@@ -98,7 +99,7 @@ class InferenceModule:
         pil_img = self.decode_img(img)
 
         # Resize and center crop
-        resized_img = pil_img.resize((256, 256), Image.BICUBIC)
+        resized_img = pil_img.resize((256, 256), Image.BILINEAR)
         cropped_img = self.center_crop(resized_img, 224, 224)  # Центрированная обрезка до 224x224
 
         np_img = np.array(cropped_img).astype(np.float32)
@@ -160,3 +161,45 @@ class InferenceModule:
 
         # Открываем изображение с помощью PIL
         return Image.open(img_buffer).convert("RGB")
+
+    
+    def preprocess_image_torchvision(
+        self,
+        img: str,
+    ) -> np.ndarray:
+        """
+        Preprocess the input image for ResNet using torchvision.transforms.
+
+        Args:
+            img (str): Base64 encoded image string.
+
+        Returns:
+            np.ndarray: Preprocessed image as a NumPy array.
+        """
+        # Decode base64 image to PIL Image
+        pil_img = self.decode_img(img)
+
+        # Define preprocessing pipeline using torchvision.transforms
+        self.preprocess = transforms.Compose([
+            transforms.Resize(256, interpolation=transforms.InterpolationMode.BILINEAR),
+        ])
+
+        # Apply preprocessing pipeline
+        pil_img = self.preprocess(pil_img)
+
+        # Center crop 224x224
+        pil_img = self.center_crop(pil_img, 224, 224)  
+
+        # Convert PyTorch tensor to NumPy array and add batch dimension
+        np_img = np.array(pil_img).astype(np.float32)
+
+        # Normalize using ImageNet mean and std
+        normalized_img = (np_img / 255.0 - np.array([0.485, 0.456, 0.406])) / np.array([0.229, 0.224, 0.225])
+
+        # Transpose to match NCHW format
+        ordered_img = np.transpose(normalized_img, (2, 0, 1))
+
+        # Add batch dimension
+        batched_img = np.expand_dims(ordered_img, axis=0)
+
+        return batched_img
