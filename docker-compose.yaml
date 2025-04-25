@@ -33,3 +33,23 @@ services:
           devices:
             - capabilities: [gpu]
               count: 1
+
+  # Prometheus для сбора метрик
+  prometheus:
+    container_name: prometheus
+    image: prom/prometheus:latest
+    ports:
+      - 9090:9090
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    restart: always
+
+  # Grafana для визуализации метрик
+  grafana:
+    container_name: grafana
+    image: grafana/grafana:latest
+    ports:
+      - 3000:3000
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin  # Установите пароль для Grafana
+    restart: always
