@@ -20,12 +20,12 @@ output [
 
 dynamic_batching {
     preferred_batch_size: [ 8, 16 ]
-    max_queue_delay_microseconds: 100
+    max_queue_delay_microseconds: 25000
 }
 
 instance_group [
     {
         kind: KIND_GPU
-        count: 1
+        count: 3
     }
 ]
