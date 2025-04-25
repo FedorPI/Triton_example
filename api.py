@@ -3,6 +3,7 @@ from PIL import Image
 import base64
 import io
 import asyncio
+from fastapi import HTTPException
 from infer_triton import InferenceModule  # Импортируем ваш модуль инференса
 
 app = FastAPI()
@@ -49,4 +50,4 @@ async def predict(
         }
 
     except Exception as e:
-        return {"error": str(e)}
+        raise HTTPException(status_code=500, detail=f"Unexpected error: {str(e)}")
