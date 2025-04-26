@@ -14,18 +14,18 @@ output [
   {
     name: "output"                 # Имя выходного тензора
     data_type: TYPE_FP16           # Тип данных (например, FP32)
-    dims: [1000]                   # Размерность выходных данных (например, 12 классов)
+    dims: [1000]                   # Размерность выходных данных (например, 1000 классов)
   }
 ]
 
-dynamic_batching {
-    preferred_batch_size: [ 8, 16 ]
-    max_queue_delay_microseconds: 25000
+dynamic_batching {                 # Настройка динамического батчинга
+    preferred_batch_size: 8
+    max_queue_delay_microseconds: 10000
 }
 
 instance_group [
-    {
-        kind: KIND_GPU
-        count: 3
-    }
+  {
+    kind: KIND_GPU                 # Использование GPU
+    count: 1                       # Количество экземпляров модели на GPU
+  }
 ]
