@@ -13,7 +13,7 @@ with open(IMAGE_PATH, "rb") as image_file:
     IMAGE_CONTENT = image_file.read()
 
 class ApiUser(HttpUser):
-    wait_time = between(0.1, 0.5)  # Время ожидания между задачами (в секундах)
+    wait_time = between(0, 0)  # Время ожидания между задачами (в секундах)
 
     @task
     def predict(self):
