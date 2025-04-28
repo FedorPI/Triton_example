@@ -22,3 +22,6 @@ trtexec --onnx=model.onnx --saveEngine=model.plan --minShapes=input:1x3x224x224 
 locust -f test_locust.py --host=http://127.0.0.1:5000
 ```
 Прочие файлы для тестов: test_async.py и test_usual.py
+
+---
+YouTube-туториал по этому репозиторию доступен по ссылке - [**видео**](https://youtu.be/ljqyuDxd_H0?si=Vpi4PiGrmHKSbKqg)
