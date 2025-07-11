@@ -22,7 +22,7 @@ class InferenceModule:
         model_name: str = "classifier_onnx",
     ) -> dict:
         """
-        Perform inference on the input image.
+        Perform inferessnce on the input image.
 
         Args:
             img (str): Base64 encoded image string.
